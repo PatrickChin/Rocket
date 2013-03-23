@@ -2,34 +2,34 @@ package patrick.object.core;
 
 import patrick.geom.Geom;
 
-public class Vector2f {
+public class Vec2 {
 
-	public float i, j;
+	public double i, j;
 
-	public Vector2f() {
+	public Vec2() {
 		i = 0;
 		j = 0;
 	}
 
-	public Vector2f(float i, float j) {
+	public Vec2(double i, double j) {
 		this.i = i;
 		this.j = j;
 	}
 
-	public Vector2f(Vector2f v) {
+	public Vec2(Vec2 v) {
 		i = v.i;
 		j = v.j;
 	}
 
-	public void add(Vector2f... vs) {
-		for (Vector2f v : vs) {
+	public void add(Vec2... vs) {
+		for (Vec2 v : vs) {
 			i += v.i;
 			j += v.j;
 		}
 	}
 
-	public void sub(Vector2f... vs) {
-		for (Vector2f v : vs) {
+	public void sub(Vec2... vs) {
+		for (Vec2 v : vs) {
 			i -= v.i;
 			j -= v.j;
 		}
@@ -39,22 +39,10 @@ public class Vector2f {
 		i *= scalar;
 		j *= scalar;
 	}
-
-	@Deprecated
-	public Vector2f scaled(double scalar) {
-		Vector2f vec = this.copy();
-		vec.scale(scalar);
-		return vec;
-	}
-
+	
 	public void negate() {
 		i = -i;
 		j = -j;
-	}
-
-	@Deprecated
-	public Vector2f negated() {
-		return new Vector2f(-i, -j);
 	}
 	
 	public void reciprocate() {
@@ -67,11 +55,6 @@ public class Vector2f {
 		j *= j;
 	}
 
-	@Deprecated
-	public Vector2f squared() {
-		return new Vector2f(i * i, j * j);
-	}
-
 	public void rotate(double a) {
 		double cos = Math.cos(a), sin = Math.sin(a);
 		rotate(cos, sin);
@@ -79,38 +62,17 @@ public class Vector2f {
 
 	public void rotate(double sin, double cos) {
 		double i_ = i * cos - j * sin;
-		j = (float) (i * sin + j * cos);
-		i = (float) i_;
+		j = (double) (i * sin + j * cos);
+		i = (double) i_;
 	}
 
-	@Deprecated
-	public Vector2f rotated(double a) {
-		Vector2f v = copy();
-		v.rotate(a);
-		return v;
-	}
-
-	@Deprecated
-	public Vector2f rotated(double sin, double cos) {
-		Vector2f v = copy();
-		v.rotate(sin, cos);
-		return v;
-	}
-
-	public void cross(Vector2f v) {
-		float i_ = (i * v.i) - (j * v.j);
+	public void cross(Vec2 v) {
+		double i_ = (i * v.i) - (j * v.j);
 		j = (i * v.j) + (j * v.i);
 		i = i_;
 	}
 
-	@Deprecated
-	public Vector2f crossed(Vector2f v) {
-		Vector2f v1 = copy();
-		v1.cross(v);
-		return v1;
-	}
-
-	public double dot(Vector2f v) {
+	public double dot(Vec2 v) {
 		return i * v.i + j * v.j;
 	}
 
@@ -130,14 +92,14 @@ public class Vector2f {
 		return j / i;
 	}
 
-	public double acuteAngleTo(Vector2f v) {
+	public double acuteAngleTo(Vec2 v) {
 		double a = Math.abs(angle() - v.angle());
 		if (a <= Math.PI)
 			return a;
 		return Math.PI * 2 - a;
 	}
 
-	public double angleTo(Vector2f v) {
+	public double angleTo(Vec2 v) {
 		double dot = dot(v);
 		if (dot == 0)
 			return Math.PI / 2;
@@ -149,7 +111,7 @@ public class Vector2f {
 		return (length() * Math.cos(angle() - angle));
 	}
 
-	public boolean isOrthogonal(Vector2f v) {
+	public boolean isOrthogonal(Vec2 v) {
 		return dot(v) == 0;
 	}
 
@@ -159,13 +121,13 @@ public class Vector2f {
 			angle += Math.PI;
 		}
 		angle = Geom.normaliseAngle(angle);
-		i = (float) (length * Math.cos(angle));
-		j = (float) (length * Math.sin(angle));
+		i = length * Math.cos(angle);
+		j = length * Math.sin(angle);
 	}
 	
 	public void set(double length, double sin, double cos) {
-		i = (float) (length * cos);
-		j = (float) (length * sin);
+		i = length * cos;
+		j = length * sin;
 	}
 
 	public void setAngle(double angle) {
@@ -192,14 +154,14 @@ public class Vector2f {
 		j /= l;
 	}
 
-	public Vector2f copy() {
-		return new Vector2f(i, j);
+	public Vec2 copy() {
+		return new Vec2(i, j);
 	}
 
 	@Override
 	public boolean equals(Object o) {
-		if (o instanceof Vector2f) {
-			Vector2f v = (Vector2f) o;
+		if (o instanceof Vec2) {
+			Vec2 v = (Vec2) o;
 			return v.i == i && v.j == j;
 		}
 		return false;
@@ -207,13 +169,13 @@ public class Vector2f {
 
 	@Override
 	public String toString() {
-		return String.format("%s[i=%.2f,j=%.2f]", ""
+		return String.format("%s[i=%.3f,j=%.3f]", ""
 		/* Vector.class.getSimpleName() */, i, j);
 	}
 
 	public String toString2() {
-		return String.format("%s[length=%.2f,angle=%.2f\u00B0]",
-				Vector2f.class.getSimpleName(), length(),
+		return String.format("%s[length=%.3d,angle=%.3d\u00B0]",
+				Vec2.class.getSimpleName(), length(),
 				Math.toDegrees(angle()));
 	}
 

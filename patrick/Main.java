@@ -12,24 +12,19 @@ import java.awt.image.BufferStrategy;
 import javax.swing.JFrame;
 
 import patrick.object.Rocket2f;
-import patrick.object.core.Vector2f;
 
 public class Main extends Canvas implements Runnable, KeyListener {
 
 	private static final long serialVersionUID = -1024197000844393309L;
-	public static final int WIDTH = 300, HEIGHT = 280, NS_PER_FRAME = 10000,
-			NS_PER_UPDATE = 10;
+	public static final int WIDTH = 300, HEIGHT = 280, NS_PER_FRAME = 1000 * 1000,
+			NS_PER_UPDATE = 1000 * 10;
 	public static final float SCALE = 4;
 	
 	public boolean running = true;
 	public boolean updating = true;
 	public final JFrame frame;
 	
-	public Rocket2f r = new Rocket2f(100, 3000);
-	
-	Arr arr = new Arr();
-	int arrCount = 0;
-	static final int arrUpdate = 100000;
+	public Rocket2f r = new Rocket2f(.1f, 500);
 	
 	public Main() {
 		Dimension dim = new Dimension(WIDTH, HEIGHT);
@@ -46,18 +41,7 @@ public class Main extends Canvas implements Runnable, KeyListener {
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 		
-	}
-	
-	class Arr {
-		int[] vals = new int[WIDTH / 2];
-		int pos = vals.length - 1;
-	
-		void addVal(int val) {
-			vals[pos--] = val;
-			pos = pos == -1 ? vals.length - 1 : pos;
-		}
-	}
-	
+	}	
 	
 	public void render() {
 		BufferStrategy bs = getBufferStrategy();
@@ -71,15 +55,6 @@ public class Main extends Canvas implements Runnable, KeyListener {
 		g.fillRect(0, 0, getWidth(), getHeight());		
 		
 		r.draw(g, SCALE);
-		
-		/*g.setColor(Color.ORANGE);
-		int x = 0;
-		for (int i = arr.pos - 1; i > -1; i--) {
-			g.fillRect(x++, HEIGHT - arr.vals[i], 1, 1);
-		}
-		for (int i = arr.vals.length - 1; i >= arr.pos; i--) {
-			g.fillRect(x++, HEIGHT - arr.vals[i], 1, 1);
-		}*/
 		
 		g.dispose();
 		bs.show();
@@ -104,24 +79,18 @@ public class Main extends Canvas implements Runnable, KeyListener {
 	public void run() {
 		r.setLoc(getWidth() * 1f / SCALE, getHeight() * 0.5f / SCALE);
 		
-		long t, t1 = 0, t2 = 0;
+		long t1 = 0, t2 = 0;
 		while (running) {
 
-			if (System.nanoTime() - t1 > NS_PER_UPDATE) {
+			if (System.nanoTime() - t1 >= NS_PER_UPDATE) {
 				r.update((System.nanoTime() - t1) * 1e-9);
 				checkCollision();
 				t1 = System.nanoTime();
 			}
 
-			if ((t = System.nanoTime() - t2) > NS_PER_FRAME) {
+			if (System.nanoTime() - t2 >= NS_PER_FRAME) {
 				render();
 				t2 = System.nanoTime();
-				arrCount++;
-			}
-			
-			if (t > arrUpdate) {
-				System.out.println(r.loc.j);
-				arrCount = 0;
 			}
 		}
 		frame.dispose();
