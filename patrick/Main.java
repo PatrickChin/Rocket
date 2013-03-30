@@ -11,28 +11,34 @@ import java.awt.image.BufferStrategy;
 
 import javax.swing.JFrame;
 
-import patrick.object.Rocket2f;
+import patrick.object.core.Vec2;
 
 public class Main extends Canvas implements Runnable, KeyListener {
 
 	private static final long serialVersionUID = -1024197000844393309L;
-	public static final int WIDTH = 300, HEIGHT = 280, NS_PER_FRAME = 1000 * 1000,
-			NS_PER_UPDATE = 1000 * 10;
-	public static final float SCALE = 4;
+	
+	public static final int WIDTH = 640, HEIGHT = 480;
+	public static final String NAME = "Patrick's Java Application";
+	
+	/**
+	 * Default: 15 ~ 66.7 FPS
+	 */
+	private static final int MS_PER_FRAME = 15;
+	private static final int NS_PER_UPDATE = 1000 * 1000 * 10;
+	public static float SCALE = 4;
 	
 	public boolean running = true;
 	public boolean updating = true;
-	public final JFrame frame;
-	
-	public Rocket2f r = new Rocket2f(.1f, 500);
+	private final JFrame frame;
 	
 	public Main() {
 		Dimension dim = new Dimension(WIDTH, HEIGHT);
 		setSize(dim);
 		addKeyListener(this);
-		addKeyListener(r);
 
 		frame = new JFrame();
+		frame.setName(NAME);
+		frame.setTitle(NAME);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new BorderLayout());
 		frame.add(this, BorderLayout.CENTER);
@@ -40,6 +46,9 @@ public class Main extends Canvas implements Runnable, KeyListener {
 
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
+	}
+	
+	public void update(double dt) {
 		
 	}	
 	
@@ -54,7 +63,7 @@ public class Main extends Canvas implements Runnable, KeyListener {
 		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, getWidth(), getHeight());		
 		
-		r.draw(g, SCALE);
+		
 		
 		g.dispose();
 		bs.show();
@@ -74,54 +83,25 @@ public class Main extends Canvas implements Runnable, KeyListener {
 	
 	@Override public void keyReleased(KeyEvent e) {}
 	@Override public void keyTyped(KeyEvent e) {}
-
+	
 	@Override
 	public void run() {
-		r.setLoc(getWidth() * 1f / SCALE, getHeight() * 0.5f / SCALE);
 		
-		long t1 = 0, t2 = 0;
+		long t1 = 0, t2 = 0, dt = 0;
 		while (running) {
-
-			if (System.nanoTime() - t1 >= NS_PER_UPDATE) {
-				r.update((System.nanoTime() - t1) * 1e-9);
-				checkCollision();
+			dt = System.nanoTime() - t1;
+			if (updating && dt >= NS_PER_UPDATE) {
+				update(dt * 1e-9);
 				t1 = System.nanoTime();
 			}
 
-			if (System.nanoTime() - t2 >= NS_PER_FRAME) {
+			if (System.currentTimeMillis() >= t2) {
 				render();
-				t2 = System.nanoTime();
+				t2 = System.currentTimeMillis() + MS_PER_FRAME;
 			}
 		}
 		frame.dispose();
-		System.exit(0);
 	}
-	
-	public void checkCollision() {/*
-		Vector2f[] s = r.getShape();
-		
-		s[0].add(r.loc);
-		float minx = s[0].i + r.loc.i, maxx = minx, miny = s[0].j + r.loc.j, maxy = miny;
-		
-		for (int i = 1; i < s.length; i++) {			
-			s[i].add(r.loc);
-			
-			if (s[i].i < minx) minx = s[i].i;
-			else if (s[i].i > maxx) maxx = s[i].i;
-			
-			if (s[i].j < miny) miny = s[i].j;
-			else if (s[i].j > maxy) maxy = s[i].j;
-		}
-		
-		if (maxx > 0) {
-			r.loc.i = -minx;
-			r.velo.i *= -1;
-		}
-		if (maxy > 0) {
-			r.loc.j = -miny;
-			r.velo.j *= -1;
-		}
-	*/}
 	
 	public static void main(String[] args) {
 		Main m = new Main();

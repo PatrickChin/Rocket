@@ -45,7 +45,7 @@ public class Rocket2f implements KeyListener {
 
 	public void rotate(double theta) {
 		turnVelo += theta;
-		Geom.normaliseAngle(turnVelo);
+		Geom.normalizeAngle(turnVelo);
 		double sin = Math.sin(theta), cos = Math.cos(theta);
 		for (Vec2 v : shape) {
 			v.rotate(sin, cos);
@@ -66,31 +66,31 @@ public class Rocket2f implements KeyListener {
 			
 			double Pt_m = power * delta / mass;
 			
-			double u = velo.i; 
-			int sign = dir.i < 0 ? -1 : 1;
-			velo.i = sign * Math.sqrt(Math.abs(u * u + sign * 2 * Pt_m * dir.i));
-			loc.i += sign * (velo.i * velo.i * velo.i - u * u * u) * mass / (3 * power) * dir.i;
+			double u = velo.x; 
+			int sign = dir.x < 0 ? -1 : 1;
+			velo.x = sign * (float) Math.sqrt(Math.abs(u * u + sign * 2 * Pt_m * dir.x));
+			loc.x += sign * (velo.x * velo.x * velo.x - u * u * u) * mass / (3 * power) * dir.x;
 			
-			u = velo.j; 
-			sign = dir.j < 0 ? -1 : 1;
-			velo.j = sign * Math.sqrt(Math.abs(u * u + sign * 2 * Pt_m * dir.j));
-			loc.j += sign * (velo.j * velo.j * velo.j - u * u * u) * mass / (3 * power) * dir.j;
+			u = velo.y; 
+			sign = dir.y < 0 ? -1 : 1;
+			velo.y = sign * (float) Math.sqrt(Math.abs(u * u + sign * 2 * Pt_m * dir.y));
+			loc.y += sign * (velo.y * velo.y * velo.y - u * u * u) * mass / (3 * power) * dir.y;
 			
 		} else {
-			if (velo.i > vSmall || velo.i < -vSmall) {
-				double i = Math.log(Math.abs(velo.i) * Drag_const * delta + 1) / Drag_const;
-				loc.i += velo.i > 0 ? i : -i;
-				velo.i /= 1 + Math.abs(velo.i) * Drag_const * delta;
+			if (velo.x > vSmall || velo.x < -vSmall) {
+				double i = Math.log(Math.abs(velo.x) * Drag_const * delta + 1) / Drag_const;
+				loc.x += velo.x > 0 ? i : -i;
+				velo.x /= 1 + Math.abs(velo.x) * Drag_const * delta;
 			} else {
-				velo.i = 0;
+				velo.x = 0;
 			}
 
-			if (velo.j > vSmall || velo.j < -vSmall) {
-				double j = Math.log(Math.abs(velo.j) * Drag_const * delta + 1) / Drag_const;
-				loc.j += velo.j > 0 ? j : -j;
-				velo.j /= 1 + Math.abs(velo.j) * Drag_const * delta;
+			if (velo.y > vSmall || velo.y < -vSmall) {
+				double j = Math.log(Math.abs(velo.y) * Drag_const * delta + 1) / Drag_const;
+				loc.y += velo.y > 0 ? j : -j;
+				velo.y /= 1 + Math.abs(velo.y) * Drag_const * delta;
 			} else {
-				velo.j = 0;
+				velo.y = 0;
 			}
 		}
 	}
@@ -103,13 +103,13 @@ public class Rocket2f implements KeyListener {
 
 		g.setColor(Color.GREEN);
 		scale = -scale;
-		int x = (int) (scale * loc.i);
-		int y = (int) (scale * loc.j);
+		int x = (int) (scale * loc.x);
+		int y = (int) (scale * loc.y);
 		for (int i = 0, j = shape.length - 1; i < shape.length; i++) {
-			g.drawLine(x + (int) (scale * shape[j].i), y
-					+ (int) (scale * shape[j].j), x
-					+ (int) (scale * shape[i].i), y
-					+ (int) (scale * shape[i].j));
+			g.drawLine(x + (int) (scale * shape[j].x), y
+					+ (int) (scale * shape[j].y), x
+					+ (int) (scale * shape[i].x), y
+					+ (int) (scale * shape[i].y));
 			j = i;
 		}
 	}

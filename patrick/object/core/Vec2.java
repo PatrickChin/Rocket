@@ -1,95 +1,110 @@
 package patrick.object.core;
 
-import patrick.geom.Geom;
 
-public class Vec2 {
-
-	public double i, j;
+public class Vec2 extends java.awt.geom.Point2D.Float {
+	
+	private static final long serialVersionUID = -5338129004851001465L;
 
 	public Vec2() {
-		i = 0;
-		j = 0;
+		x = 0;
+		y = 0;
 	}
 
-	public Vec2(double i, double j) {
-		this.i = i;
-		this.j = j;
+	public Vec2(float x, float y) {
+		this.x = x;
+		this.y = y;
 	}
 
 	public Vec2(Vec2 v) {
-		i = v.i;
-		j = v.j;
+		x = v.x;
+		y = v.y;
 	}
 
 	public void add(Vec2... vs) {
 		for (Vec2 v : vs) {
-			i += v.i;
-			j += v.j;
+			x += v.x;
+			y += v.y;
 		}
 	}
 
 	public void sub(Vec2... vs) {
 		for (Vec2 v : vs) {
-			i -= v.i;
-			j -= v.j;
+			x -= v.x;
+			y -= v.y;
 		}
 	}
 
-	public void scale(double scalar) {
-		i *= scalar;
-		j *= scalar;
+	public void scale(float scalar) {
+		x *= scalar;
+		y *= scalar;
 	}
-	
+
 	public void negate() {
-		i = -i;
-		j = -j;
+		x = -x;
+		y = -y;
 	}
-	
+
 	public void reciprocate() {
-		i = 1 / i;
-		j = 1 / j;
+		x = 1 / x;
+		y = 1 / y;
 	}
 
 	public void square() {
-		i *= i;
-		j *= j;
+		x *= x;
+		y *= y;
 	}
 
-	public void rotate(double a) {
-		double cos = Math.cos(a), sin = Math.sin(a);
+	public void rotate(double theta) {
+		double cos = Math.cos(theta), sin = Math.sin(theta);
 		rotate(cos, sin);
 	}
 
-	public void rotate(double sin, double cos) {
-		double i_ = i * cos - j * sin;
-		j = (double) (i * sin + j * cos);
-		i = (double) i_;
+	public void rotate(double cos, double sin) {
+		float i_ = (float) (x * cos - y * sin);
+		y = (float) (x * sin + y * cos);
+		x = i_;
+	}
+	
+	public void rotateAbout(double theta, Vec2 origin) {
+		sub(origin);
+		rotate(theta);
+		add(origin);
+	}
+	
+	public void rotateAbout(double cos, double sin, Vec2 origin) {
+		sub(origin);
+		rotate(cos, sin);
+		add(origin);
 	}
 
 	public void cross(Vec2 v) {
-		double i_ = (i * v.i) - (j * v.j);
-		j = (i * v.j) + (j * v.i);
-		i = i_;
+		float i_ = (x * v.x) - (y * v.y);
+		y = (x * v.y) + (y * v.x);
+		x = i_;
 	}
 
-	public double dot(Vec2 v) {
-		return i * v.i + j * v.j;
+	public float dot(Vec2 v) {
+		return x * v.x + y * v.y;
 	}
 
 	public double angle() {
-		return Math.atan2(j, i);
+		return Math.atan2(y, x);
 	}
 
 	public double lengthSq() {
-		return (i * i) + (j * j);
+		return (x * x) + (y * y);
 	}
 
 	public double length() {
-		return Math.sqrt((i * i) + (j * j));
+		return Math.sqrt((x * x) + (y * y));
 	}
 
-	public double gradient() {
-		return j / i;
+	public float gradient() {
+		return y / x;
+	}
+	
+	public Vec2 midpoint() {
+		return new Vec2(x * 0.5f, y * 0.5f);
 	}
 
 	public double acuteAngleTo(Vec2 v) {
@@ -103,7 +118,7 @@ public class Vec2 {
 		double dot = dot(v);
 		if (dot == 0)
 			return Math.PI / 2;
-		double mags = Math.sqrt((i * i + j * j) * (v.i * v.i + v.j * v.j));
+		double mags = Math.sqrt((x * x + y * y) * (v.x * v.x + v.y * v.y));
 		return Math.acos(dot(v) / mags);
 	}
 
@@ -118,51 +133,47 @@ public class Vec2 {
 	public void set(double length, double angle) {
 		if (length < 0) {
 			length = -length;
+			angle %= Math.PI * 2;
 			angle += Math.PI;
 		}
-		angle = Geom.normaliseAngle(angle);
-		i = length * Math.cos(angle);
-		j = length * Math.sin(angle);
+		x = (float) (length * Math.cos(angle));
+		y = (float) (length * Math.sin(angle));
 	}
-	
+
 	public void set(double length, double sin, double cos) {
-		i = length * cos;
-		j = length * sin;
+		x = (float) (length * cos);
+		y = (float) (length * sin);
 	}
 
 	public void setAngle(double angle) {
 		set(length(), angle);
 	}
-	
+
 	public void setAngle(double sin, double cos) {
-		set(length(), sin , cos);
-	}
-	
-	public void addAngle(double angle) {
-		set(length(), angle() + angle);
+		set(length(), sin, cos);
 	}
 
-	public void setLength(double len) {
-		i *= len;
-		j *= len;
+	public final void setLength(float len) {
+		x *= len;
+		y *= len;
 		normalise();
 	}
 
 	public void normalise() {
 		double l = length();
-		i /= l;
-		j /= l;
+		x /= l;
+		y /= l;
 	}
 
 	public Vec2 copy() {
-		return new Vec2(i, j);
+		return new Vec2(x, y);
 	}
 
 	@Override
 	public boolean equals(Object o) {
 		if (o instanceof Vec2) {
 			Vec2 v = (Vec2) o;
-			return v.i == i && v.j == j;
+			return v.x == x && v.y == y;
 		}
 		return false;
 	}
@@ -170,17 +181,22 @@ public class Vec2 {
 	@Override
 	public String toString() {
 		return String.format("%s[i=%.3f,j=%.3f]", ""
-		/* Vector.class.getSimpleName() */, i, j);
+		/* Vector.class.getSimpleName() */, x, y);
 	}
 
 	public String toString2() {
-		return String.format("%s[length=%.3d,angle=%.3d\u00B0]",
-				Vec2.class.getSimpleName(), length(),
-				Math.toDegrees(angle()));
+		return String.format("%s[length=%.3f,angle=%.3f\u00B0]",
+				Vec2.class.getSimpleName(), length(), Math.toDegrees(angle()));
 	}
 
 	public void print() {
 		System.out.println(toString());
 	}
-
+	
+	//private Cache cache = new Cache();
+	//private class Cache {
+	//	public boolean[] clean = new boolean[3];
+	//	public double length, lengthSq, angle, gradient;
+	//}
+	
 }

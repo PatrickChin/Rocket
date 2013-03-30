@@ -4,7 +4,7 @@ public class Geom {
 	
 	public static final double twoPI = Math.PI * 2;
 	
-	public static double normaliseAngle(double theta) {
+	public static double normalizeAngle(double theta) {
 		if ((theta < -twoPI) || (theta > twoPI)) {
 			theta %= twoPI;
 		}
